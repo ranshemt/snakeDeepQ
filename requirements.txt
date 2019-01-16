@@ -1,0 +1,7 @@
+numpy
+pygame
+keras
+seaborn
+matplotlib
+pandas
+operator
