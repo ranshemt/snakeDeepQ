@@ -1,1 +1,1 @@
-web: python snakeClass.py
+release: python snakeClass.py
