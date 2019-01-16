@@ -4,4 +4,3 @@ keras
 seaborn
 matplotlib
 pandas
-operator
