@@ -1,8 +1,10 @@
+#//Ran Shem Tov      -   206059586
+#//Natali Mahmali    -   311266399
 import enum as Enum
 #UI (snakeClass.py)
 showGame = True
 speed = 1
-trains = 150
+trains = 10
 #agent model
 outputDim = 120
 outputDimLast = 3
@@ -29,6 +31,8 @@ score = 0
 #snakeClass.py
 wait = 1
 epslonInit = 80
+#
+bestRunI = 0
    # # # # # # # # # # # # # #
   # BACKUP default settings #
  # # # # # # # # # # # # # #

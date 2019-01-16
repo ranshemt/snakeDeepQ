@@ -1,4 +1,6 @@
-#import:
+#//Ran Shem Tov      -   206059586
+#//Natali Mahmali    -   311266399
+# #import:
 # python casual libraris
 from random import randint
 import numpy as np
@@ -23,6 +25,7 @@ trains = C.trains
 pygame.font.init()
 #
 #
+C.bestRunI = 0
 class Game:
     #constructor for the game
     def __init__(self, game_width, game_height):
@@ -162,12 +165,12 @@ def display_ui(game, score, record, count):
     scoreStr = "Score: " + str(score)
     text_score = myfont.render(scoreStr, True, (0, 0, 0))
     
-    recordStr = "Highest: " + str(record)
+    recordStr = "Highest: " + str(record) + ' (game: ' + str(C.bestRunI) + ')'
     text_highest = myfont.render(recordStr, True, (0, 0, 0))
     
     game.gameDisplay.blit(text_run, (10, 440))
-    game.gameDisplay.blit(text_score, (150, 440))
-    game.gameDisplay.blit(text_highest, (290, 440))
+    game.gameDisplay.blit(text_score, (160, 440))
+    game.gameDisplay.blit(text_highest, (245, 440))
 
     game.gameDisplay.blit(game.bg, (10, 10))
 #
@@ -209,10 +212,10 @@ def process_quit():
     return False
 #
 #quit
-def myQuit():
+def myQuit(agent, counter_plot, score_plot):
     #
     #save data for future runs
-    agent.model.save_weights('weights.hdf5')
+    agent.model.save_weights('weights.hdf6')
     #plot the results
     plot_seaborn(counter_plot, score_plot)
     #
@@ -250,7 +253,7 @@ def run():
         while not game.crash:
             #close when X pressed
             if process_quit() == True:
-                myQuit()
+                myQuit(agent, counter_plot, score_plot)
 
             # high epsilon = exploration = randomness
             agent.epsilon = C.epslonInit - counter_games
@@ -280,7 +283,12 @@ def run():
 
             # store the new data into a long term memory
             agent.remember(state_old, final_move, reward, state_new, game.crash)
+            
+            #record
+            if game.score > record:
+                C.bestRunI = counter_games
             record = get_record(game.score, record)
+             
             if display_option:
                 display(player1, food1, game, record, counter_games)
                 pygame.time.wait(C.speed)
@@ -291,12 +299,12 @@ def run():
         agent.replay_new(agent.memory)
         counter_games += 1
         #print to console
-        print('Game', counter_games, '      Score:', game.score)
+        print('Game', counter_games, '      Score:', game.score,'       bestRunI: ', C.bestRunI)
         score_plot.append(game.score)
         counter_plot.append(counter_games)
     #finished all tarining loops
     #
-    myQuit()
+    myQuit(agent, counter_plot, score_plot)
   # # # # # #
  # "main" #
 # # # # # 

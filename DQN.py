@@ -1,3 +1,5 @@
+#//Ran Shem Tov      -   206059586
+#//Natali Mahmali    -   311266399
 #
 #
 #optimizer, required for keras model compilation
@@ -41,14 +43,13 @@ class DQNAgent(object):
         #
         #
         #old network
-        #self.model = self.network("weights.hdf5")
+        self.model = self.network("weights.hdf5")
         #
         #
         # low epsilon = exploitation = rely on data
         self.epsilon = C.epsilon
         #
-        #@#@can delete??
-        self.actual = []
+        
         #long term memory
         self.memory = []
     #
