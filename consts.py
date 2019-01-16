@@ -1,7 +1,7 @@
 import enum as Enum
 #UI (snakeClass.py)
 showGame = True
-speed = 10
+speed = 1
 trains = 150
 #agent model
 outputDim = 120
@@ -27,7 +27,7 @@ eatenReward = 10
 #Game class
 score = 0
 #snakeClass.py
-wait = 150
+wait = 1
 epslonInit = 80
    # # # # # # # # # # # # # #
   # BACKUP default settings #

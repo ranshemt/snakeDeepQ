@@ -144,7 +144,7 @@ def eat(player, food, game):
         player.eaten = True
         game.score = game.score + 1
 #
-#update record
+#
 def get_record(score, record):
     if score >= record:
         return score
@@ -152,23 +152,29 @@ def get_record(score, record):
         return record
 #
 #UI
-def display_ui(game, score, record):
+def display_ui(game, score, record, count):
     myfont = pygame.font.SysFont('Segoe UI', 20)
     myfont_bold = pygame.font.SysFont('Segoe UI', 20, True)
-    text_score = myfont.render('SCORE: ', True, (0, 0, 0))
-    text_score_number = myfont.render(str(score), True, (0, 0, 0))
-    text_highest = myfont.render('HIGHEST SCORE: ', True, (0, 0, 0))
-    text_highest_number = myfont_bold.render(str(record), True, (0, 0, 0))
-    game.gameDisplay.blit(text_score, (45, 440))
-    game.gameDisplay.blit(text_score_number, (120, 440))
-    game.gameDisplay.blit(text_highest, (190, 440))
-    game.gameDisplay.blit(text_highest_number, (350, 440))
+    
+    runStr = 'Run: ' + str(count) + ' / ' + str(C.trains)
+    text_run = myfont.render(runStr, True, (0, 0, 0))
+    
+    scoreStr = "Score: " + str(score)
+    text_score = myfont.render(scoreStr, True, (0, 0, 0))
+    
+    recordStr = "Highest: " + str(record)
+    text_highest = myfont.render(recordStr, True, (0, 0, 0))
+    
+    game.gameDisplay.blit(text_run, (10, 440))
+    game.gameDisplay.blit(text_score, (150, 440))
+    game.gameDisplay.blit(text_highest, (290, 440))
+
     game.gameDisplay.blit(game.bg, (10, 10))
 #
 #game display
-def display(player, food, game, record):
+def display(player, food, game, record, count):
     game.gameDisplay.fill((255, 255, 255))
-    display_ui(game, game.score, record)
+    display_ui(game, game.score, record, count)
     player.display_player(player.position[-1][0], player.position[-1][1], player.food, game)
     food.display_food(food.x_food, food.y_food, game)
 #
@@ -195,6 +201,23 @@ def plot_seaborn(array_counter, array_score):
     ax.set(xlabel='games', ylabel='score')
     plt.show()
 #
+#handle events
+def process_quit():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            return True
+    return False
+#
+#quit
+def myQuit():
+    #
+    #save data for future runs
+    agent.model.save_weights('weights.hdf5')
+    #plot the results
+    plot_seaborn(counter_plot, score_plot)
+    #
+    pygame.quit()
+#
 #main function
 def run():
     #
@@ -220,11 +243,15 @@ def run():
         initialize_game(player1, game, food1, agent)
         #
         if display_option:
-            display(player1, food1, game, record)
+            display(player1, food1, game, record, counter_games)
           # # # # # # # # #
          # learning loop #
         # # # # # # # # #
         while not game.crash:
+            #close when X pressed
+            if process_quit() == True:
+                myQuit()
+
             # high epsilon = exploration = randomness
             agent.epsilon = C.epslonInit - counter_games
 
@@ -255,9 +282,12 @@ def run():
             agent.remember(state_old, final_move, reward, state_new, game.crash)
             record = get_record(game.score, record)
             if display_option:
-                display(player1, food1, game, record)
-                pygame.time.wait(speed)
+                display(player1, food1, game, record, counter_games)
+                pygame.time.wait(C.speed)
         #finished learning loop
+        #before starting next learning loop,
+            #train the agent with random step from the history
+            #so it won't make random selection
         agent.replay_new(agent.memory)
         counter_games += 1
         #print to console
@@ -265,10 +295,8 @@ def run():
         score_plot.append(game.score)
         counter_plot.append(counter_games)
     #finished all tarining loops
-    #save data for future runs
-    agent.model.save_weights('weights.hdf5')
-    #plot the results
-    plot_seaborn(counter_plot, score_plot)
+    #
+    myQuit()
   # # # # # #
  # "main" #
 # # # # # 
