@@ -13,27 +13,29 @@ import numpy as np
 import pandas as pd
 #operators
 from operator import add
+#my constants
+import consts as C
 #
 #
 #
 class DQNAgent(object):
     #constructor
     def __init__(self):
-        self.reward = 0
+        self.reward = C.reward
         #higher gamma = smaller discount = cares more about long term reward
             #(example of the rat and cheese)
-        self.gamma = 0.9
+        self.gamma = C.gamma
         #DataDrame can contain any type of data
             #easier to work with it than list/dictionary
         self.dataframe = pd.DataFrame()
         self.short_memory = np.array([])
         #prediction, the goal of the neural netwrok is to minimize the loss
             #reducing the difference between agent target and predicted target
-        self.agent_target = 1
-        self.agent_predict = 0
+        self.agent_target = C.agentTarget
+        self.agent_predict = C.agentPredict
         #how quickly the network abandons former value for new one
             #easier to understand with q table (simple q learning)
-        self.learning_rate = 0.0005
+        self.learning_rate = C.learningRate
         #new network (untrained)
         self.model = self.network()
         #
@@ -43,7 +45,7 @@ class DQNAgent(object):
         #
         #
         # low epsilon = exploitation = rely on data
-        self.epsilon = 0
+        self.epsilon = C.epsilon
         #
         #@#@can delete??
         self.actual = []
@@ -157,10 +159,10 @@ class DQNAgent(object):
         #@#@try to give other rewards??
         self.reward = 0
         if crash:
-            self.reward = -10
+            self.reward = C.crashReward
             return self.reward
         if player.eaten:
-            self.reward = 10
+            self.reward = C.eatenReward
         return self.reward
     #
     #
@@ -176,14 +178,14 @@ class DQNAgent(object):
         model = Sequential()
         #first layer indicates which shape the model needs to receive
             #expected input data shape is 11 dimensional array
-        model.add(Dense(output_dim=120, activation='relu', input_dim=11))
+        model.add(Dense(output_dim = C.outputDim, activation=C.activ, input_dim=C.inputDim))
         #Dropout is used to prevent overfitting
-        model.add(Dropout(0.15))
-        model.add(Dense(output_dim=120, activation='relu'))
-        model.add(Dropout(0.15))
-        model.add(Dense(output_dim=120, activation='relu'))
-        model.add(Dropout(0.15))
-        model.add(Dense(output_dim=3, activation='softmax'))
+        model.add(Dropout(C.dropout))
+        model.add(Dense(output_dim = C.outputDim, activation=C.activ))
+        model.add(Dropout(C.dropout))
+        model.add(Dense(output_dim = C.outputDim, activation=C.activ))
+        model.add(Dropout(C.dropout))
+        model.add(Dense(output_dim=C.outputDimLast, activation=C.activLast))
         #
         #Adam = method for stockastic (random) optimization
             # with learning rate as we defined
@@ -195,7 +197,7 @@ class DQNAgent(object):
                 # (predict/target)
         #
         # Configuring the learning process with model.compile()
-        model.compile(loss='mse', optimizer=opt)
+        model.compile(loss=C.compileLoss, optimizer=opt)
         #
         #load 'old' data, already trained agent
         if weights:
@@ -209,8 +211,8 @@ class DQNAgent(object):
     #
     #in the new learning loop train the agent randomly with the long term memory
     def replay_new(self, memory):
-        if len(memory) > 1000:
-            minibatch = random.sample(memory, 1000)
+        if len(memory) > C.memoryMax:
+            minibatch = random.sample(memory, C.memoryMax)
         else:
             minibatch = memory
         for state, action, reward, next_state, done in minibatch:
@@ -234,6 +236,6 @@ class DQNAgent(object):
         #actual trainning
             #2 numpy arrays
             #epochs = nuber of iterations on data provided
-            #verbose = verbosity (Gibuv) mode, 1 = progress bar
+            #verbose = verbosity (Gibuv) mode, 0 = silent
         self.model.fit(state.reshape((1, 11)), target_f, epochs=1, verbose=0)
     #end of class DQNAgent

@@ -10,13 +10,15 @@ from keras.utils import to_categorical
 # plot (summary)
 import matplotlib.pyplot as plt
 import seaborn as sns
+#my constants
+import consts as C
 #
 #agent and its methods are described in DQN.py
 #
 # Set options to activate or deactivate the game view, and its speed
-display_option = True
-speed = 10
-trains = 200000
+display_option = C.showGame
+speed = C.speed
+trains = C.trains
 #
 pygame.font.init()
 #
@@ -33,7 +35,7 @@ class Game:
         self.player = Player(self)
         #class Food described later
         self.food = Food()
-        self.score = 0
+        self.score = C.score
 #
 #
 #
@@ -108,7 +110,7 @@ class Player(object):
 
             update_screen()
         else:
-            pygame.time.wait(150)
+            pygame.time.wait(C.wait)
 #
 #
 #
@@ -224,7 +226,7 @@ def run():
         # # # # # # # # #
         while not game.crash:
             # high epsilon = exploration = randomness
-            agent.epsilon = 80 - counter_games
+            agent.epsilon = C.epslonInit - counter_games
 
             # get old state
             state_old = agent.get_state(game, player1, food1)
